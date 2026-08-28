@@ -56,13 +56,19 @@
   defer
 ></script>
 
-<script
-  src="{{ 'view-transitions.js' | asset_url }}"
-  async
-  {% if settings.page_transition_enabled or settings.transition_to_main_product %}
+{% if settings.page_transition_enabled or settings.transition_to_main_product %}
+  <script
+    src="{{ 'view-transitions.js' | asset_url }}"
+    async
     blocking="render"
-  {% endif %}
-></script>
+  ></script>
+{% else %}
+  {%- comment -%}
+    base.css opts browsers into cross-document transitions. When both related
+    settings are off, disable that browser work as well as the JS controller.
+  {%- endcomment -%}
+  <style>@view-transition { navigation: none; }</style>
+{% endif %}
 
 <link
   rel="modulepreload"
