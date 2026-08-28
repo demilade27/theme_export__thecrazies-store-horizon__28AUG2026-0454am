@@ -1,0 +1,166 @@
+{% comment %}
+{% doc %}
+  Global light/dark theme toggle. Renders a floating button and the CSS
+  variable overrides needed to flip the site's monochrome palette.
+  The blocking script that sets the initial `data-theme` attribute (to avoid
+  a flash of the wrong theme) lives inline at the top of layout/theme.liquid.
+{% enddoc %}
+
+<button
+  type="button"
+  id="crazies-theme-toggle"
+  class="crazies-theme-toggle"
+  aria-label="Toggle dark mode"
+>
+  <svg class="crazies-theme-toggle__icon crazies-theme-toggle__icon--sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="4.5"/>
+    <path d="M12 2.5v2.25M12 19.25v2.25M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.5 12h2.25M19.25 12h2.25M4.4 19.6l1.6-1.6M18 6l1.6-1.6"/>
+  </svg>
+  <svg class="crazies-theme-toggle__icon crazies-theme-toggle__icon--moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/>
+  </svg>
+</button>
+
+{% style %}
+  .crazies-theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 0.15);
+    background: var(--color-background);
+    color: var(--color-foreground);
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.12);
+    transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, transform 0.2s ease;
+  }
+
+  .crazies-theme-toggle:hover {
+    transform: scale(1.08);
+  }
+
+  .crazies-theme-toggle__icon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.4s ease;
+  }
+
+  .crazies-theme-toggle__icon--moon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.6);
+  }
+
+  [data-theme='dark'] .crazies-theme-toggle__icon--sun {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.6);
+  }
+
+  [data-theme='dark'] .crazies-theme-toggle__icon--moon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+
+  /* Smooth cross-fade whenever the theme changes */
+  body,
+  header, footer, main,
+  .shopify-section {
+    transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  }
+
+  /* Dark theme palette overrides */
+  [data-theme='dark'] {
+    --color-background: #000000;
+    --color-background-rgb: 0, 0, 0;
+    --color-foreground: #ffffff;
+    --color-foreground-rgb: 255, 255, 255;
+    --color-border: #ffffff;
+    --color-border-rgb: 255, 255, 255;
+
+    --color-input-background: #121212;
+    --color-input-text: #ffffff;
+    --color-input-border: rgb(255 255 255 / 0.25);
+
+    --color-variant-background: #121212;
+    --color-variant-text: #ffffff;
+    --color-variant-border: rgb(255 255 255 / 0.25);
+    --color-variant-hover-background: #1c1c1c;
+    --color-variant-hover-text: #ffffff;
+    --color-variant-hover-border: rgb(255 255 255 / 0.4);
+
+    --color-selected-variant-background: #ffffff;
+    --color-selected-variant-text: #000000;
+    --color-selected-variant-border: #ffffff;
+
+    --color-secondary-button-background: #000000;
+    --color-secondary-button-text: #ffffff;
+    --color-secondary-button-border: #ffffff;
+    --color-secondary-button-hover-background: #1c1c1c;
+    --color-secondary-button-hover-text: #ffffff;
+    --color-secondary-button-hover-border: #ffffff;
+  }
+
+  [data-theme='dark'] .color-custom-popover,
+  [data-theme='dark'] .color-custom-drawer {
+    --color-background: #0d0d0d;
+    --color-background-rgb: 13, 13, 13;
+    --color-foreground: #ffffff;
+    --color-foreground-rgb: 255, 255, 255;
+    --color-border: #ffffff;
+    --color-border-rgb: 255, 255, 255;
+  }
+
+  [data-theme='dark'] .crazies-colorways__item img {
+    background: #0d0d0d;
+    border-color: rgb(255 255 255 / 0.15);
+  }
+
+  /* Sale/sold-out badges are baked as literal colors server-side (not tied to
+     the palette vars above), so they need explicit dark-mode overrides too. */
+  [data-theme='dark'] .color-custom-badge-sale {
+    --color-background: #ffffff;
+    --color-background-rgb: 255, 255, 255;
+    --color-foreground: #000000;
+    --color-foreground-rgb: 0, 0, 0;
+  }
+
+  [data-theme='dark'] .color-custom-badge-sold-out {
+    --color-background: #1c1c1c;
+    --color-background-rgb: 28, 28, 28;
+    --color-foreground: #ffffff;
+    --color-foreground-rgb: 255, 255, 255;
+    --color-border: #ffffff;
+    --color-border-rgb: 255, 255, 255;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crazies-theme-toggle,
+    .crazies-theme-toggle__icon,
+    body, header, footer, main, .shopify-section {
+      transition: none !important;
+    }
+  }
+{% endstyle %}
+
+<script>
+  (function () {
+    var toggle = document.getElementById('crazies-theme-toggle');
+    if (!toggle) return;
+
+    toggle.addEventListener('click', function () {
+      var root = document.documentElement;
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try {
+        localStorage.setItem('crazies-theme', next);
+      } catch (e) {}
+    });
+  })();
+</script>
+{% endcomment %}

@@ -1,0 +1,346 @@
+<style>
+  .tc-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .tc-popup-overlay.tc-popup--visible {
+    display: block;
+    opacity: 1;
+  }
+  .tc-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -46%);
+    width: 92%;
+    max-width: 920px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 18px;
+    background: #B50023;
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .tc-popup.tc-popup--visible {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  .tc-popup__inner {
+    display: flex;
+    min-height: 420px;
+  }
+  .tc-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+    border-radius: 50%;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    z-index: 2;
+  }
+  .tc-popup__close:focus-visible {
+    outline: 2px solid #1694CB;
+    outline-offset: 2px;
+  }
+  .tc-popup__left {
+    flex: 1;
+    background: #B50023;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .tc-popup__right {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+  }
+  .tc-popup__hi {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 20px;
+    color: #1694CB;
+    margin: 0 0 8px;
+  }
+  .tc-popup__resident {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 42px;
+    color: #1694CB;
+    margin: 0 0 24px;
+    line-height: 1.1;
+  }
+  .tc-popup__sub {
+    font-family: 'Architects Daughter', cursive;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #fff;
+    margin: 0 0 26px;
+    max-width: 340px;
+  }
+  .tc-popup__form {
+    display: flex;
+    gap: 12px;
+    max-width: 380px;
+  }
+  .tc-popup__input {
+    flex: 1;
+    padding: 14px 16px;
+    border: none;
+    background: #C8BEB6;
+    color: #4a4a4a;
+    font-family: 'Architects Daughter', cursive;
+    font-size: 15px;
+  }
+  .tc-popup__input:focus-visible {
+    outline: 2px solid #1694CB;
+    outline-offset: 2px;
+  }
+  .tc-popup__input::placeholder {
+    color: #6b6b6b;
+  }
+  .tc-popup__submit {
+    background: #1694CB;
+    color: #B50023;
+    border: 2px solid #1694CB;
+    padding: 14px 24px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .tc-popup__submit:hover {
+    opacity: 0.85;
+  }
+  .tc-popup__submit:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .tc-popup__success {
+    display: none;
+  }
+  .tc-popup__success.tc-popup--visible {
+    display: flex;
+  }
+  .tc-popup__form-wrap.tc-popup--hidden {
+    display: none;
+  }
+
+  body.tc-popup-lock {
+    overflow: hidden;
+  }
+
+  @media (max-width: 640px) {
+    .tc-popup {
+      width: 90%;
+      border-radius: 14px;
+    }
+    .tc-popup__inner {
+      flex-direction: column;
+      min-height: 0;
+    }
+    .tc-popup__right {
+      height: 140px;
+      order: -1;
+    }
+    .tc-popup__left {
+      padding: 28px 20px 32px;
+      align-items: center;
+      text-align: center;
+    }
+    .tc-popup__hi {
+      font-size: 16px;
+    }
+    .tc-popup__resident {
+      font-size: 30px;
+      margin-bottom: 14px;
+    }
+    .tc-popup__sub {
+      font-size: 14px;
+      margin-bottom: 20px;
+      max-width: 100%;
+    }
+    .tc-popup__form {
+      flex-direction: column;
+      width: 100%;
+      gap: 10px;
+    }
+    .tc-popup__input {
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+    .tc-popup__submit {
+      padding: 13px 20px;
+      font-size: 10px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tc-popup-overlay,
+    .tc-popup,
+    .tc-popup__submit {
+      transition: none !important;
+    }
+  }
+</style>
+
+{%- liquid
+  assign popup_image = files['49CD1DEE-317E-461A-8561-ACBFD2473EB0.jpg']
+  assign success_flag = request.query_string contains 'newsletter=success'
+  assign return_url = request.path | append: '?newsletter=success'
+-%}
+
+<div class="tc-popup-overlay" id="tcPopupOverlay"></div>
+
+<div class="tc-popup" id="tcPopup" role="dialog" aria-modal="true" aria-labelledby="tcPopupHeading">
+  <button class="tc-popup__close" id="tcPopupClose" aria-label="Close popup">&times;</button>
+
+  <div class="tc-popup__inner">
+    <div class="tc-popup__left">
+
+      <div class="tc-popup__form-wrap{% if success_flag %} tc-popup--hidden{% endif %}" id="tcPopupFormWrap">
+        <p class="tc-popup__hi">Hi,</p>
+        <p class="tc-popup__resident" id="tcPopupHeading">Resident</p>
+        <p class="tc-popup__sub">Want in on new arrivals, exclusive collabs, sales and more? Join the Estate. Become a Resident.</p>
+
+        {% form 'customer', id: 'tcNewsletterForm' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input type="hidden" name="return_to" value="{{ return_url }}">
+          <div class="tc-popup__form">
+            <input
+              type="email"
+              name="contact[email]"
+              class="tc-popup__input"
+              placeholder="Your email"
+              required
+            >
+            <button type="submit" class="tc-popup__submit">SUBMIT</button>
+          </div>
+        {% endform %}
+      </div>
+
+      <div class="tc-popup__success{% if success_flag %} tc-popup--visible{% endif %}" id="tcPopupSuccess" aria-live="polite">
+        <div>
+          <p class="tc-popup__hi">You're in,</p>
+          <p class="tc-popup__resident">Resident</p>
+          <p class="tc-popup__sub">Welcome to the Estate. Keep an eye on your inbox for what's next.</p>
+        </div>
+      </div>
+
+    </div>
+    <div
+      class="tc-popup__right"
+      style="background-image: url('{% if popup_image %}{{ popup_image | image_url: width: 900 }}{% endif %}');"
+    ></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var overlay = document.getElementById('tcPopupOverlay');
+    var popup = document.getElementById('tcPopup');
+    var closeBtn = document.getElementById('tcPopupClose');
+    var form = document.getElementById('tcNewsletterForm');
+    var emailInput = popup.querySelector('.tc-popup__input');
+    var lastFocused = null;
+
+    var successFlag = {{ success_flag | json }};
+    var STORAGE_KEY = 'tc_newsletter_popup_dismissed';
+
+    function alreadyDismissed() {
+      return !!localStorage.getItem(STORAGE_KEY);
+    }
+    function markDismissed() {
+      localStorage.setItem(STORAGE_KEY, '1');
+    }
+
+    function lockScroll() {
+      document.body.classList.add('tc-popup-lock');
+    }
+    function unlockScroll() {
+      document.body.classList.remove('tc-popup-lock');
+    }
+
+    function showPopup() {
+      lastFocused = document.activeElement;
+      overlay.classList.add('tc-popup--visible');
+      popup.classList.add('tc-popup--visible');
+      lockScroll();
+      var target = successFlag ? closeBtn : (emailInput || closeBtn);
+      if (target) target.focus();
+      document.addEventListener('keydown', onKeydown);
+    }
+
+    function hidePopup() {
+      overlay.classList.remove('tc-popup--visible');
+      popup.classList.remove('tc-popup--visible');
+      unlockScroll();
+      document.removeEventListener('keydown', onKeydown);
+      if (lastFocused) lastFocused.focus();
+    }
+
+    function onKeydown(e) {
+      if (e.key === 'Escape') {
+        hidePopup();
+        markDismissed();
+        return;
+      }
+      if (e.key === 'Tab') {
+        var focusable = popup.querySelectorAll('button, input, a[href]');
+        if (!focusable.length) return;
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+
+    if (successFlag) {
+      // just came back from a successful signup redirect — show the thank-you
+      // once, then never bother this visitor again
+      showPopup();
+      markDismissed();
+    } else if (!alreadyDismissed()) {
+      setTimeout(showPopup, 4000);
+    }
+
+    closeBtn.addEventListener('click', function() {
+      hidePopup();
+      markDismissed();
+    });
+
+    overlay.addEventListener('click', function() {
+      hidePopup();
+      markDismissed();
+    });
+
+    if (form) {
+      form.addEventListener('submit', function() {
+        markDismissed();
+      });
+    }
+  })();
+</script>

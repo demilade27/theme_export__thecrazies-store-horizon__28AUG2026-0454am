@@ -1,0 +1,240 @@
+<style>
+  .tc-popup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9998;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .tc-popup-overlay.tc-popup--visible {
+    display: block;
+    opacity: 1;
+  }
+  .tc-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -46%);
+    width: 92%;
+    max-width: 920px;
+    background: #B50023;
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .tc-popup.tc-popup--visible {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  .tc-popup__inner {
+    display: flex;
+    min-height: 420px;
+  }
+  .tc-popup__close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    z-index: 2;
+  }
+  .tc-popup__left {
+    flex: 1;
+    background: #B50023;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .tc-popup__right {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+  }
+  .tc-popup__hi {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 20px;
+    color: #1694CB;
+    margin: 0 0 8px;
+  }
+  .tc-popup__resident {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 42px;
+    color: #1694CB;
+    margin: 0 0 24px;
+    line-height: 1.1;
+  }
+  .tc-popup__sub {
+    font-family: 'Architects Daughter', cursive;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #fff;
+    margin: 0 0 26px;
+    max-width: 340px;
+  }
+  .tc-popup__form {
+    display: flex;
+    gap: 12px;
+    max-width: 380px;
+  }
+  .tc-popup__input {
+    flex: 1;
+    padding: 14px 16px;
+    border: none;
+    background: #C8BEB6;
+    color: #4a4a4a;
+    font-family: 'Architects Daughter', cursive;
+    font-size: 15px;
+  }
+  .tc-popup__input::placeholder {
+    color: #6b6b6b;
+  }
+  .tc-popup__submit {
+    background: #1694CB;
+    color: #B50023;
+    border: 2px solid #1694CB;
+    padding: 14px 24px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+  }
+  .tc-popup__submit:hover {
+    opacity: 0.85;
+  }
+  .tc-popup__success {
+    display: none;
+  }
+  .tc-popup__success.tc-popup--visible {
+    display: flex;
+  }
+  .tc-popup__form-wrap.tc-popup--hidden {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .tc-popup__inner {
+      flex-direction: column;
+    }
+    .tc-popup__right {
+      height: 220px;
+      order: -1;
+    }
+    .tc-popup__left {
+      padding: 36px 26px;
+      align-items: center;
+      text-align: center;
+    }
+    .tc-popup__resident {
+      font-size: 32px;
+    }
+    .tc-popup__form {
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+</style>
+
+<div class="tc-popup-overlay" id="tcPopupOverlay"></div>
+
+<div class="tc-popup" id="tcPopup">
+  <button class="tc-popup__close" id="tcPopupClose" aria-label="Close">&times;</button>
+
+  <div class="tc-popup__inner">
+    <div class="tc-popup__left">
+
+      <div class="tc-popup__form-wrap" id="tcPopupFormWrap">
+        <p class="tc-popup__hi">Hi,</p>
+        <p class="tc-popup__resident">Resident</p>
+        <p class="tc-popup__sub">Want in on new arrivals, exclusive collabs, sales and more? Join the Estate. Become a Resident.</p>
+
+        {% form 'customer', id: 'tcNewsletterForm' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="tc-popup__form">
+            <input
+              type="email"
+              name="contact[email]"
+              class="tc-popup__input"
+              placeholder="Your email"
+              required
+            >
+            <button type="submit" class="tc-popup__submit">SUBMIT</button>
+          </div>
+        {% endform %}
+      </div>
+
+      <div class="tc-popup__success" id="tcPopupSuccess">
+        <div>
+          <p class="tc-popup__hi">You're in,</p>
+          <p class="tc-popup__resident">Resident</p>
+          <p class="tc-popup__sub">Welcome to the Estate. Keep an eye on your inbox for what's next.</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="tc-popup__right" style="background-image: url('{{ 'IMG_0014_Edit.jpg' | file_url }}');"></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var overlay = document.getElementById('tcPopupOverlay');
+    var popup = document.getElementById('tcPopup');
+    var closeBtn = document.getElementById('tcPopupClose');
+    var form = document.getElementById('tcNewsletterForm');
+    var formWrap = document.getElementById('tcPopupFormWrap');
+    var successWrap = document.getElementById('tcPopupSuccess');
+
+    var STORAGE_KEY = 'tc_newsletter_popup_dismissed';
+    var SIGNUP_KEY = 'tc_newsletter_signed_up';
+
+    function alreadyHandled() {
+      return localStorage.getItem(STORAGE_KEY) || localStorage.getItem(SIGNUP_KEY);
+    }
+
+    function showPopup() {
+      overlay.classList.add('tc-popup--visible');
+      popup.classList.add('tc-popup--visible');
+    }
+
+    function hidePopup() {
+      overlay.classList.remove('tc-popup--visible');
+      popup.classList.remove('tc-popup--visible');
+    }
+
+    if (!alreadyHandled()) {
+      setTimeout(showPopup, 4000);
+    }
+
+    closeBtn.addEventListener('click', function() {
+      hidePopup();
+      localStorage.setItem(STORAGE_KEY, Date.now());
+    });
+
+    overlay.addEventListener('click', function() {
+      hidePopup();
+      localStorage.setItem(STORAGE_KEY, Date.now());
+    });
+
+    if (form) {
+      form.addEventListener('submit', function() {
+        localStorage.setItem(SIGNUP_KEY, '1');
+        setTimeout(function() {
+          formWrap.classList.add('tc-popup--hidden');
+          successWrap.classList.add('tc-popup--visible');
+        }, 50);
+      });
+    }
+  })();
+</script>
