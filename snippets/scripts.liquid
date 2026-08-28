@@ -169,17 +169,17 @@
   };
 
   loadMatchingModules();
+  let moduleScanQueued = false;
   new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      for (const node of mutation.addedNodes) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          // Include the added element itself as well as descendants.
-          loadMatchingModules({
-            querySelector: (selector) => node.matches(selector) ? node : node.querySelector(selector),
-          });
-        }
-      }
-    }
+    if (moduleScanQueued || !mutations.some((mutation) => mutation.addedNodes.length > 0)) return;
+
+    // Third-party apps and section updates often add many nodes in one turn.
+    // Scan once per frame instead of running every selector for every node.
+    moduleScanQueued = true;
+    requestAnimationFrame(() => {
+      moduleScanQueued = false;
+      loadMatchingModules();
+    });
   }).observe(document.body, { childList: true, subtree: true });
 </script>
 {% if settings.show_add_discount_code %}
