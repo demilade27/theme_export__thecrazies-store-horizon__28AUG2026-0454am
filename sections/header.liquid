@@ -1168,11 +1168,24 @@
 {% endstylesheet %}
 
 {% unless request.design_mode %}
-  <script type="module">
-    import { hydrate } from '@theme/section-hydration';
-    const url = new URL(window.location.href);
-    url.searchParams.delete('page');
-    hydrate('{{ section.id }}', url);
+  <script>
+    // The header is already rendered by Liquid. Re-hydrating it is useful for
+    // client-side navigation state, but it is not needed for the first paint.
+    // Deferring the Section Rendering API and morphing modules keeps their
+    // parse/evaluation work out of the initial critical path.
+    window.addEventListener('load', function () {
+      var schedule = window.requestIdleCallback || function (callback) {
+        return window.setTimeout(callback, 1500);
+      };
+
+      schedule(function () {
+        import('@theme/section-hydration').then(function (module) {
+          var url = new URL(window.location.href);
+          url.searchParams.delete('page');
+          module.hydrate('{{ section.id }}', url);
+        });
+      }, { timeout: 3000 });
+    }, { once: true });
   </script>
 {% endunless %}
 
