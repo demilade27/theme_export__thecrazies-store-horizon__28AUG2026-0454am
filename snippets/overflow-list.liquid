@@ -27,7 +27,19 @@
   {% endif %}
 >
   <template shadowrootmode="open">
-    {{ 'overflow-list.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      This component is only used by the product swatch picker. Load its
+      shadow-DOM stylesheet asynchronously so it cannot delay the initial
+      document render. The `media` value is switched once the file arrives;
+      the noscript version preserves its styling when JavaScript is disabled.
+    {%- endcomment -%}
+    <link
+      rel="stylesheet"
+      href="{{ 'overflow-list.css' | asset_url }}"
+      media="print"
+      onload="this.media='all'"
+    >
+    <noscript>{{ 'overflow-list.css' | asset_url | stylesheet_tag }}</noscript>
 
     <ul part="list">
       <slot></slot>
