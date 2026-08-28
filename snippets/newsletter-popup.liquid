@@ -204,7 +204,10 @@
 
 {%- liquid
   assign popup_image = files['49CD1DEE-317E-461A-8561-ACBFD2473EB0.jpg']
-  assign success_flag = request.query_string contains 'newsletter=success'
+  assign success_flag = false
+  if request.query_string contains 'newsletter=success'
+    assign success_flag = true
+  endif
   assign return_url = request.path | append: '?newsletter=success'
 -%}
 
