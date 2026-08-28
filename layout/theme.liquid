@@ -25,6 +25,13 @@
     {% endif %}
 
     {%- render 'meta-tags' -%}
+    {% comment %} Shared display fonts: keep connection hints centralized so Custom Liquid sections do not duplicate them. {% endcomment %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Luckiest+Guy&family=Press+Start+2P&display=swap"
+    >
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
     {%- render 'scripts' -%}
