@@ -845,14 +845,13 @@ function updateHeaderHeights() {
   const headerHeight = header.offsetHeight;
   const headerGroupHeight = calculateHeaderGroupHeight(header);
   const headerTopRow = /** @type {HTMLElement} | null */ (header.querySelector('.header__row--top'));
+  const headerTopRowHeight = headerTopRow?.offsetHeight;
 
   document.body.style.setProperty('--header-height', `${headerHeight}px`);
   document.body.style.setProperty('--header-group-height', `${headerGroupHeight}px`);
 
-  if (headerTopRow) {
-    window.requestAnimationFrame(function () {
-      header.style.setProperty('--top-row-height', `${headerTopRow.offsetHeight}px`);
-    });
+  if (headerTopRowHeight !== undefined) {
+    header.style.setProperty('--top-row-height', `${headerTopRowHeight}px`);
   }
 }
 

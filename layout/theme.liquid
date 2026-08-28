@@ -67,6 +67,7 @@
 
           const headerTopRow = header.querySelector('.header__row--top');
           const headerHeight = header.offsetHeight;
+          const headerTopRowHeight = headerTopRow?.offsetHeight;
 
           // Calculate the total height of the header group
           let headerGroupHeight = 0;
@@ -86,10 +87,8 @@
           document.body.style.setProperty('--header-height', `${headerHeight}px`);
           document.body.style.setProperty('--header-group-height', `${headerGroupHeight}px`);
 
-          if (headerTopRow) {
-            window.requestAnimationFrame(function () {
-              document.body.style.setProperty('--top-row-height', `${headerTopRow.offsetHeight}px`);
-            });
+          if (headerTopRowHeight !== undefined) {
+            document.body.style.setProperty('--top-row-height', `${headerTopRowHeight}px`);
           }
 
           /**
