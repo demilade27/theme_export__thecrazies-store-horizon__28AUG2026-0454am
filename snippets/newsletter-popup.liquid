@@ -248,7 +248,7 @@
     </div>
     <div
       class="tc-popup__right"
-      style="background-image: url('{% if popup_image %}{{ popup_image | image_url: width: 900 }}{% endif %}');"
+      data-background-image="{% if popup_image %}{{ popup_image | image_url: width: 900 }}{% endif %}"
     ></div>
   </div>
 </div>
@@ -260,6 +260,7 @@
     var closeBtn = document.getElementById('tcPopupClose');
     var form = document.getElementById('tcNewsletterForm');
     var emailInput = popup.querySelector('.tc-popup__input');
+    var popupImage = popup.querySelector('.tc-popup__right');
     var lastFocused = null;
 
     var successFlag = {{ success_flag | json }};
@@ -280,6 +281,11 @@
     }
 
     function showPopup() {
+      // The artwork is decorative and hidden until the popup opens. Loading it
+      // here avoids competing with LCP images and avoids an initial decode.
+      if (popupImage && popupImage.dataset.backgroundImage && !popupImage.style.backgroundImage) {
+        popupImage.style.backgroundImage = 'url("' + popupImage.dataset.backgroundImage + '")';
+      }
       lastFocused = document.activeElement;
       overlay.classList.add('tc-popup--visible');
       popup.classList.add('tc-popup--visible');
